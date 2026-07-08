@@ -57,10 +57,14 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
         })
       });
 
-      const data = await response.json();
+      let data = {}
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json()
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to login');
+        throw new Error(data.error || `Server error: ${response.status} ${response.statusText}`)
       }
 
       if (playSfx) playSfx('complete', soundEnabled)

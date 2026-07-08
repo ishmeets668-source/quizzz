@@ -10,7 +10,7 @@ import History from './models/History.js';
 
 dotenv.config();
 
-// Connect to MongoDB
+// Connect to MongoDB (non-blocking server initialization)
 const mongoURI = process.env.MONGODB_URI;
 if (!mongoURI) {
   console.error("MONGODB_URI is not defined in the environment variables!");
@@ -20,12 +20,27 @@ if (!mongoURI) {
 mongoose.connect(mongoURI)
   .then(() => console.log('Successfully connected to MongoDB.'))
   .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-    process.exit(1);
+    console.error('Error connecting to MongoDB during startup:', err.message);
+    console.error('The server will remain active but database operations will fail until connection is resolved.');
   });
+
+// Listen to connection error events after initial connection
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error event:', err.message);
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Database availability middleware
+const checkDbConnection = (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({
+      error: 'Database connection is offline. Please make sure your IP is whitelisted on MongoDB Atlas and credentials are correct.'
+    });
+  }
+  next();
+};
 
 app.use(cors());
 app.use(express.json());
@@ -249,7 +264,7 @@ app.post('/api/verify-otp', (req, res) => {
 });
 
 // Endpoint: Direct Password Login
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', checkDbConnection, async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -312,7 +327,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Endpoint: Get History for a user
-app.get('/api/history', async (req, res) => {
+app.get('/api/history', checkDbConnection, async (req, res) => {
   const { email } = req.query;
 
   if (!email) {
@@ -330,7 +345,7 @@ app.get('/api/history', async (req, res) => {
 });
 
 // Endpoint: Save new History entry
-app.post('/api/history', async (req, res) => {
+app.post('/api/history', checkDbConnection, async (req, res) => {
   const { email, name, subject, difficulty, totalQuestions, score, percentage, status, dateTime, id } = req.body;
 
   if (!email || !name || !subject || !difficulty || totalQuestions === undefined || score === undefined || percentage === undefined || !status || !dateTime || id === undefined) {
@@ -364,7 +379,7 @@ app.post('/api/history', async (req, res) => {
 });
 
 // Endpoint: Delete a single History entry by numeric ID
-app.delete('/api/history/:id', async (req, res) => {
+app.delete('/api/history/:id', checkDbConnection, async (req, res) => {
   const { id } = req.params;
   const { email } = req.query;
 
@@ -388,7 +403,7 @@ app.delete('/api/history/:id', async (req, res) => {
 });
 
 // Endpoint: Clear all History entries for a user
-app.delete('/api/history', async (req, res) => {
+app.delete('/api/history', checkDbConnection, async (req, res) => {
   const { email } = req.query;
 
   if (!email) {
