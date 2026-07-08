@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs';
 import User from './models/User.js';
 import History from './models/History.js';
 
-dotenv.config();
+dotenv.config({ override: true });
 
 // Connect to MongoDB (non-blocking server initialization)
 const mongoURI = process.env.MONGODB_URI;
