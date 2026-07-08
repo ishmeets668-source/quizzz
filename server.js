@@ -3,8 +3,26 @@ import cors from 'cors';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import User from './models/User.js';
+import History from './models/History.js';
 
 dotenv.config();
+
+// Connect to MongoDB
+const mongoURI = process.env.MONGODB_URI;
+if (!mongoURI) {
+  console.error("MONGODB_URI is not defined in the environment variables!");
+  process.exit(1);
+}
+
+mongoose.connect(mongoURI)
+  .then(() => console.log('Successfully connected to MongoDB.'))
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+    process.exit(1);
+  });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -229,6 +247,164 @@ app.post('/api/verify-otp', (req, res) => {
     });
   }
 });
+
+// Endpoint: Direct Password Login
+app.post('/api/login', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Name, email, and password are required.' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  }
+
+  if (name.trim().length < 2) {
+    return res.status(400).json({ error: 'Name must be at least 2 characters.' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  }
+
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Check if user exists
+    let user = await User.findOne({ email: normalizedEmail });
+    
+    if (user) {
+      // User exists, verify password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ error: 'Invalid password. Please try again.' });
+      }
+    } else {
+      // User doesn't exist, create a new user
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = new User({
+        name: name.trim(),
+        email: normalizedEmail,
+        password: hashedPassword
+      });
+      await user.save();
+    }
+
+    // Create candidate session payload
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful.',
+      session: {
+        token: sessionToken,
+        email: user.email,
+        name: user.name,
+        loggedInAt: Date.now()
+      }
+    });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    return res.status(500).json({ error: 'Internal server error during login.' });
+  }
+});
+
+// Endpoint: Get History for a user
+app.get('/api/history', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required to fetch history.' });
+  }
+
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    const history = await History.find({ email: normalizedEmail }).sort({ id: -1 });
+    return res.status(200).json({ success: true, history });
+  } catch (error) {
+    console.error('Error fetching history:', error);
+    return res.status(500).json({ error: 'Internal server error fetching history.' });
+  }
+});
+
+// Endpoint: Save new History entry
+app.post('/api/history', async (req, res) => {
+  const { email, name, subject, difficulty, totalQuestions, score, percentage, status, dateTime, id } = req.body;
+
+  if (!email || !name || !subject || !difficulty || totalQuestions === undefined || score === undefined || percentage === undefined || !status || !dateTime || id === undefined) {
+    return res.status(400).json({ error: 'Missing required history parameters.' });
+  }
+
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    const newRecord = new History({
+      email: normalizedEmail,
+      name: name.trim(),
+      subject,
+      difficulty,
+      totalQuestions,
+      score,
+      percentage,
+      status,
+      dateTime,
+      id
+    });
+    
+    await newRecord.save();
+    
+    // Fetch and return the updated history for the user
+    const history = await History.find({ email: normalizedEmail }).sort({ id: -1 });
+    return res.status(200).json({ success: true, message: 'Record saved successfully.', history });
+  } catch (error) {
+    console.error('Error saving history record:', error);
+    return res.status(500).json({ error: 'Internal server error saving history.' });
+  }
+});
+
+// Endpoint: Delete a single History entry by numeric ID
+app.delete('/api/history/:id', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required to delete history.' });
+  }
+
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    const result = await History.deleteOne({ id: parseInt(id), email: normalizedEmail });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Record not found or not owned by you.' });
+    }
+    
+    return res.status(200).json({ success: true, message: 'Record deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting record:', error);
+    return res.status(500).json({ error: 'Internal server error deleting history.' });
+  }
+});
+
+// Endpoint: Clear all History entries for a user
+app.delete('/api/history', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required to clear history.' });
+  }
+
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    await History.deleteMany({ email: normalizedEmail });
+    return res.status(200).json({ success: true, message: 'All history cleared successfully.' });
+  } catch (error) {
+    console.error('Error clearing history:', error);
+    return res.status(500).json({ error: 'Internal server error clearing history.' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Secure OTP Server running on http://localhost:${PORT}`);

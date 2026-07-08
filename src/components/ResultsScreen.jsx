@@ -153,27 +153,15 @@ export default function ResultsScreen({
           Retry Quiz
         </button>
         
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => {
-              if (playSfx) playSfx('click', soundEnabled)
-              onChooseAnother()
-            }}
-            className="py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-xs font-bold tracking-wider uppercase active:scale-[0.99] transition-all duration-200 cursor-pointer border border-white/10"
-          >
-            Choose Another Subject
-          </button>
-          
-          <button
-            onClick={() => {
-              if (playSfx) playSfx('click', soundEnabled)
-              onGoHome()
-            }}
-            className="py-2.5 rounded-xl bg-slate-900 text-real-white hover:bg-slate-800 text-xs font-bold tracking-wider uppercase active:scale-[0.99] transition-all duration-200 cursor-pointer shadow-md"
-          >
-            Go to Home
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            if (playSfx) playSfx('click', soundEnabled)
+            onGoHome()
+          }}
+          className="w-full py-2.5 rounded-xl bg-slate-900 text-real-white hover:bg-slate-800 text-xs font-bold tracking-wider uppercase active:scale-[0.99] transition-all duration-200 cursor-pointer shadow-md border border-white/5"
+        >
+          Go to Home
+        </button>
       </div>
     </div>
   )

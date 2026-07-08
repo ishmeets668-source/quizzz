@@ -2,7 +2,8 @@ import React from 'react'
 
 export default function HistoryScreen({
   historyList,
-  setHistoryList,
+  onDeleteRecord,
+  onClearAll,
   onBack,
   soundEnabled,
   playSfx
@@ -30,16 +31,13 @@ export default function HistoryScreen({
 
   const handleDeleteRecord = (id) => {
     if (playSfx) playSfx('click', soundEnabled)
-    const updated = historyList.filter(item => item.id !== id)
-    setHistoryList(updated)
-    localStorage.setItem('quiz_history', JSON.stringify(updated))
+    if (onDeleteRecord) onDeleteRecord(id)
   }
 
   const handleClearAll = () => {
     if (playSfx) playSfx('click', soundEnabled)
     if (window.confirm('Are you sure you want to clear all history?')) {
-      setHistoryList([])
-      localStorage.removeItem('quiz_history')
+      if (onClearAll) onClearAll()
     }
   }
 
@@ -99,9 +97,11 @@ export default function HistoryScreen({
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{emoji}</span>
                     <span className="text-sm font-bold text-white truncate">{record.subject}</span>
-                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-white/5 text-white/55">
-                      {record.difficulty}
-                    </span>
+                    {record.difficulty && record.difficulty !== 'General' && (
+                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-white/5 text-white/55">
+                        {record.difficulty}
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-white/80 font-medium">
                     👤 Candidate: <span className="text-brand-yellow font-semibold">{record.name}</span>

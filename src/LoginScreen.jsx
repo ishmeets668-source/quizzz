@@ -1,36 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 
 export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [otp, setOtp] = useState('')
-  const [otpSent, setOtpSent] = useState(false)
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  
-  // Rate-limiting resend timer
-  const [resendCooldown, setResendCooldown] = useState(0)
-  
-  // Custom notification messages
   const [notification, setNotification] = useState(null) // { type: 'success' | 'error', text: '' }
-  
-  const timerRef = useRef(null)
-
-  // Manage resend cooldown timer
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      timerRef.current = setInterval(() => {
-        setResendCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [resendCooldown])
+  const [isSuccessState, setIsSuccessState] = useState(false)
 
   // Email format validation helper
   const validateEmail = (emailVal) => {
@@ -38,15 +15,29 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
     return emailRegex.test(emailVal.trim())
   }
 
-  // Trigger: Send OTP
-  const handleSendOtp = async (e) => {
+  const isFormValid = name.trim().length >= 2 && validateEmail(email) && password.length >= 6
+
+  const handleLogin = async (e) => {
     if (e) e.preventDefault()
-    if (loading || resendCooldown > 0) return
+    if (loading) return
 
     if (playSfx) playSfx('click', soundEnabled)
 
+    if (name.trim().length < 2) {
+      setNotification({ type: 'error', text: 'Candidate Name must be at least 2 characters.' })
+      if (playSfx) playSfx('incorrect', soundEnabled)
+      return
+    }
+
     if (!validateEmail(email)) {
       setNotification({ type: 'error', text: 'Please enter a valid email address.' })
+      if (playSfx) playSfx('incorrect', soundEnabled)
+      return
+    }
+
+    if (password.length < 6) {
+      setNotification({ type: 'error', text: 'Password must be at least 6 characters.' })
+      if (playSfx) playSfx('incorrect', soundEnabled)
       return
     }
 
@@ -54,78 +45,69 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
     setNotification(null)
 
     try {
-      const response = await fetch('/api/send-otp', {
+      const response = await fetch('/api/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
-      })
-      const data = await response.json()
-
-      if (response.ok) {
-        setOtpSent(true)
-        setResendCooldown(30)
-        setNotification({ 
-          type: 'success', 
-          text: 'OTP has been sent to your registered email address.' 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password
         })
-        if (playSfx) playSfx('correct', soundEnabled)
-      } else {
-        setNotification({ type: 'error', text: data.error || 'Failed to send OTP. Please try again.' })
-        if (playSfx) playSfx('incorrect', soundEnabled)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to login');
       }
-    } catch (err) {
-      console.error(err)
-      setNotification({ 
-        type: 'error', 
-        text: 'Connection to server failed. Please ensure the backend is running.' 
-      })
+
+      if (playSfx) playSfx('complete', soundEnabled)
+      setIsSuccessState(true)
+      
+      setTimeout(() => {
+        onLoginSuccess(data.session.name, data.session.email)
+      }, 1500)
+    } catch (error) {
+      setNotification({ type: 'error', text: error.message })
       if (playSfx) playSfx('incorrect', soundEnabled)
     } finally {
       setLoading(false)
     }
   }
 
-  // Trigger: Verify OTP & Login
-  const handleVerifyOtp = async (e) => {
-    if (e) e.preventDefault()
-    if (loading) return
+  if (isSuccessState) {
+    return (
+      <div className="w-full animate-fade-in flex flex-col items-center py-12 text-center space-y-6">
+        {/* Logo container */}
+        <div className="w-24 h-24 rounded-3xl bg-real-white shadow-2xl hover:scale-105 transition-transform duration-300 overflow-hidden border border-blue-100 flex items-center justify-center p-2 mb-2">
+          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" className="w-full h-full object-contain animate-pulse" />
+        </div>
 
-    if (playSfx) playSfx('click', soundEnabled)
+        <div className="space-y-3 max-w-sm px-4 text-slate-800">
+          <h2 className="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent leading-tight">
+            Welcome, {name}!
+          </h2>
+          <p className="text-base font-bold text-slate-600">
+            Your Mock Test is ready.
+          </p>
+        </div>
 
-    if (otp.trim().length !== 6 || isNaN(otp.trim())) {
-      setNotification({ type: 'error', text: 'Please enter a valid 6-digit numeric OTP.' })
-      return
-    }
-
-    setLoading(true)
-    setNotification(null)
-
-    try {
-      const response = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), otp: otp.trim() }),
-      })
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-        if (playSfx) playSfx('complete', soundEnabled)
-        setNotification({ type: 'success', text: 'Login successful! Redirecting...' })
-        
-        setTimeout(() => {
-          onLoginSuccess(data.session.name, data.session.email)
-        }, 1000)
-      } else {
-        setNotification({ type: 'error', text: data.error || 'Invalid OTP. Please try again.' })
-        if (playSfx) playSfx('incorrect', soundEnabled)
-      }
-    } catch (err) {
-      console.error(err)
-      setNotification({ type: 'error', text: 'Server error occurred during verification.' })
-      if (playSfx) playSfx('incorrect', soundEnabled)
-    } finally {
-      setLoading(false)
-    }
+        {/* Loading Spinner */}
+        <div className="flex flex-col items-center justify-center space-y-3 mt-6">
+          <div className="relative w-12 h-12">
+            {/* Outer spinning ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+            {/* Inner pulsing pulse */}
+            <div className="absolute inset-2 rounded-full bg-blue-500/10 animate-ping"></div>
+          </div>
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest animate-pulse">
+            Configuring Mock Test Dashboard...
+          </span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -163,31 +145,39 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
           </div>
         )}
 
-        <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp} className="space-y-5 relative z-10">
+        <form onSubmit={handleLogin} className="space-y-4 relative z-10">
           <div className="border-b border-white/10 pb-3 mb-2 flex items-center justify-between">
             <h3 className="font-extrabold text-sm text-slate-700 tracking-wide uppercase">
-              {otpSent ? 'Enter Security Code' : 'Candidate Registration'}
+              Candidate Login
             </h3>
-            {otpSent && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (playSfx) playSfx('click', soundEnabled)
-                  setOtpSent(false)
-                  setOtp('')
-                  setNotification(null)
-                }}
-                className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer flex items-center gap-1"
-              >
-                Change Email
-              </button>
-            )}
+          </div>
+
+          {/* Name input field */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
+              Candidate Full Name
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                disabled={loading}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+              />
+            </div>
           </div>
 
           {/* Email input field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
-              Candidate Email Address
+              Email Address
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
@@ -197,115 +187,83 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
               </span>
               <input
                 type="email"
-                disabled={loading || otpSent}
+                disabled={loading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 ${
-                  otpSent 
-                    ? 'border-slate-200 opacity-65 cursor-not-allowed'
-                    : 'border-slate-200/80 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
-                }`}
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
             </div>
           </div>
 
-          {/* OTP field (Rendered only after OTP is sent) */}
-          {otpSent && (
-            <div className="space-y-1.5 animate-slide-up">
-              <div className="flex justify-between items-center pr-1">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
-                  Enter 6-Digit OTP
-                </label>
-                {resendCooldown > 0 ? (
-                  <span className="text-[10px] text-slate-400 font-bold">
-                    Resend in {resendCooldown}s
-                  </span>
+          {/* Password input field */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
+              Password
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </span>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                disabled={loading}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full pl-11 pr-10 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (playSfx) playSfx('click', soundEnabled)
+                  setShowPassword(!showPassword)
+                }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer border-none bg-transparent"
+              >
+                {showPassword ? (
+                  <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    className="text-[10px] font-black text-blue-600 hover:text-blue-800 cursor-pointer"
-                  >
-                    Resend OTP
-                  </button>
+                  <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
                 )}
-              </div>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                  <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </span>
-                <input
-                  type="text"
-                  maxLength={6}
-                  disabled={loading}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter 6-digit code"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium tracking-widest text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                />
-              </div>
+              </button>
             </div>
-          )}
+          </div>
 
-          {/* Action button */}
-          {!otpSent ? (
-            <button
-              type="submit"
-              disabled={loading || !validateEmail(email)}
-              className={`w-full py-3 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 border border-transparent ${
-                !validateEmail(email) || loading
-                  ? 'bg-slate-200/60 text-slate-400 cursor-not-allowed shadow-none'
-                  : 'bg-blue-600 hover:bg-blue-700 text-real-white shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 active:scale-[0.99] cursor-pointer'
-              }`}
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  <span>Sending Verification Code...</span>
-                </>
-              ) : (
-                <>
-                  <span>Send Verification OTP</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading || otp.trim().length !== 6}
-              className={`w-full py-3 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 border border-transparent ${
-                otp.trim().length !== 6 || loading
-                  ? 'bg-slate-200/60 text-slate-400 cursor-not-allowed shadow-none'
-                  : 'bg-blue-600 hover:bg-blue-700 text-real-white shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 active:scale-[0.99] cursor-pointer'
-              }`}
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  <span>Verifying Code...</span>
-                </>
-              ) : (
-                <>
-                  <span>Verify & Login</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </>
-              )}
-            </button>
-          )}
+          {/* Login Action button */}
+          <button
+            type="submit"
+            disabled={loading || !isFormValid}
+            className={`w-full py-3 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 border border-transparent ${
+              !isFormValid || loading
+                ? 'bg-slate-200/60 text-slate-400 cursor-not-allowed shadow-none'
+                : 'bg-blue-600 hover:bg-blue-700 text-real-white shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 active:scale-[0.99] cursor-pointer'
+            }`}
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <span>Logging In...</span>
+              </>
+            ) : (
+              <>
+                <span>Login</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </>
+            )}
+          </button>
         </form>
       </div>
     </div>

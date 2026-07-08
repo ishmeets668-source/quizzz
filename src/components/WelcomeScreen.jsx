@@ -262,10 +262,7 @@ export default function WelcomeScreen({
       hasDropdown: true,
       options: [
         { key: 'ccc', title: 'CCC', emoji: '🖥️' },
-        { key: 'ip_it', title: 'IP/IT', emoji: '💼' },
-        { key: 'excel_mis', title: 'Advanced Excel (MIS)', emoji: '📊' },
-        { key: 'excel_macro', title: 'Advanced Excel (Macro)', emoji: '⚙️' },
-        { key: 'excel_dashboard', title: 'Advanced Excel (Dashboard)', emoji: '📈' }
+        { key: 'ip_it', title: 'IP/IT', emoji: '💼' }
       ]
     }
   ]

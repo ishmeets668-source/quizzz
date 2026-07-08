@@ -1,3 +1,12 @@
+import { tallyQuestions, dfaQuestions, adfaQuestions, pdfaQuestions, taxationQuestions } from './courses/accounting.js';
+import { graphicDesignQuestions, coreldrawQuestions, photoshopQuestions, illustratorQuestions, threeDEffectsQuestions } from './courses/graphic_design.js';
+import { reactQuestions, gsapQuestions, lenisQuestions, cLangQuestions, cppQuestions, phpQuestions, javaQuestions, javascriptQuestions, sqlQuestions, linuxQuestions } from './courses/coding_extra.js';
+import { webDesignQuizQuestions, oLevelQuestions, aLevelQuestions, dataScientistQuestions, googleAdsQuestions, seoQuestions, wordpressQuestions } from './courses/professional.js';
+import { excelMisQuestions, excelMacroQuestions, excelDashboardQuestions, advancedExcelQuestions } from './courses/excel.js';
+import { niitQuestions, ditQuestions, adcaQuestions, dcaQuestions } from './courses/diploma.js';
+import { pandasQuestions, numpyQuestions, machineLearningQuestions, powerBiQuestions, tableauQuestions } from './courses/data_analyst.js';
+import { basicQuestions, cccQuestions, ipItQuestions } from './courses/other.js';
+
 export const QUESTION_BANK = {
   coding: {
     title: 'Technology & Coding',
@@ -2048,7 +2057,57 @@ export const QUESTION_BANK = {
             explanation: 'Python compares numerical values by casting them to a common type. Since 2 and 2.0 represent the same mathematical value, the expression evaluates to True.'
           }
         ]
-      }
+      },
+      tally: tallyQuestions,
+      dfa: dfaQuestions,
+      adfa: adfaQuestions,
+      pdfa: pdfaQuestions,
+      taxation: taxationQuestions,
+      
+      graphic_design: graphicDesignQuestions,
+      coreldraw: coreldrawQuestions,
+      photoshop: photoshopQuestions,
+      illustrator: illustratorQuestions,
+      three_d_effects: threeDEffectsQuestions,
+      
+      react: reactQuestions,
+      gsap: gsapQuestions,
+      lenis: lenisQuestions,
+      c_lang: cLangQuestions,
+      cpp: cppQuestions,
+      php: phpQuestions,
+      java: javaQuestions,
+      javascript: javascriptQuestions,
+      sql: sqlQuestions,
+      linux: linuxQuestions,
+      
+      web_design_quiz: webDesignQuizQuestions,
+      o_level: oLevelQuestions,
+      a_level: aLevelQuestions,
+      data_scientist: dataScientistQuestions,
+      google_ads: googleAdsQuestions,
+      seo: seoQuestions,
+      wordpress: wordpressQuestions,
+      
+      excel_mis: excelMisQuestions,
+      excel_macro: excelMacroQuestions,
+      excel_dashboard: excelDashboardQuestions,
+      advanced_excel: advancedExcelQuestions,
+      
+      niit: niitQuestions,
+      dit: ditQuestions,
+      adca: adcaQuestions,
+      dca: dcaQuestions,
+      
+      pandas: pandasQuestions,
+      numpy: numpyQuestions,
+      machine_learning: machineLearningQuestions,
+      power_bi: powerBiQuestions,
+      tableau: tableauQuestions,
+      
+      basic: basicQuestions,
+      ccc: cccQuestions,
+      ip_it: ipItQuestions
     }
   }
 };
