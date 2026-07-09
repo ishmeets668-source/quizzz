@@ -32,6 +32,17 @@ mongoose.connection.on('error', (err) => {
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Restore original req.url from Vercel headers (since Vercel rewrites it internally to the function path)
+app.use((req, res, next) => {
+  const originalPath = req.headers['x-vercel-forwarded-path'] || req.headers['x-invoke-path'];
+  if (originalPath) {
+    const queryIndex = req.url.indexOf('?');
+    const queryString = queryIndex !== -1 ? req.url.substring(queryIndex) : '';
+    req.url = originalPath + queryString;
+  }
+  next();
+});
+
 // Database availability middleware
 const checkDbConnection = (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
