@@ -11,28 +11,36 @@ import History from './models/History.js';
 dotenv.config({ override: true });
 
 let lastMongoError = "Connection attempt not started yet.";
+let dbConnectionPromise = null;
 
-// Connect to MongoDB (non-blocking server initialization)
-const mongoURI = process.env.MONGODB_URI;
-if (!mongoURI) {
-  lastMongoError = "MONGODB_URI environment variable is missing.";
-  console.error("MONGODB_URI is not defined in the environment variables!");
-  if (!process.env.VERCEL) {
-    process.exit(1);
+const ensureDbConnected = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return;
   }
-} else {
-  lastMongoError = "Connecting...";
-  mongoose.connect(mongoURI)
-    .then(() => {
-      console.log('Successfully connected to MongoDB.');
-      lastMongoError = null;
-    })
-    .catch((err) => {
-      console.error('Error connecting to MongoDB during startup:', err.message);
-      console.error('The server will remain active but database operations will fail until connection is resolved.');
-      lastMongoError = err.message;
-    });
-}
+  
+  const mongoURI = process.env.MONGODB_URI;
+  if (!mongoURI) {
+    lastMongoError = "MONGODB_URI environment variable is missing.";
+    throw new Error("MONGODB_URI environment variable is missing.");
+  }
+  
+  if (!dbConnectionPromise) {
+    lastMongoError = "Connecting...";
+    dbConnectionPromise = mongoose.connect(mongoURI)
+      .then(() => {
+        console.log('Successfully connected to MongoDB.');
+        lastMongoError = null;
+      })
+      .catch((err) => {
+        console.error('Error connecting to MongoDB:', err.message);
+        lastMongoError = err.message;
+        dbConnectionPromise = null; // Allow retry on next request
+        throw err;
+      });
+  }
+  
+  await dbConnectionPromise;
+};
 
 // Listen to connection error events after initial connection
 mongoose.connection.on('error', (err) => {
@@ -55,35 +63,46 @@ app.use((req, res, next) => {
 });
 
 // Database availability middleware
-const checkDbConnection = (req, res, next) => {
-  if (mongoose.connection.readyState !== 1) {
+const checkDbConnection = async (req, res, next) => {
+  try {
+    await ensureDbConnected();
+    next();
+  } catch (err) {
     return res.status(503).json({
       error: 'Database connection is offline. Please make sure your IP is whitelisted on MongoDB Atlas and credentials are correct.',
       details: lastMongoError
     });
   }
-  next();
 };
 
 app.use(cors());
 app.use(express.json());
 
 // Endpoint: Check API and Database Status
-app.get('/api/status', (req, res) => {
-  const dbState = mongoose.connection.readyState;
-  const states = {
-    0: 'disconnected',
-    1: 'connected',
-    2: 'connecting',
-    3: 'disconnecting',
-    99: 'uninitialized'
-  };
-  
-  return res.status(dbState === 1 ? 200 : 503).json({
-    status: dbState === 1 ? 'online' : 'offline',
-    database: states[dbState] || 'unknown',
-    details: lastMongoError
-  });
+app.get('/api/status', async (req, res) => {
+  try {
+    await ensureDbConnected();
+    return res.status(200).json({
+      status: 'online',
+      database: 'connected',
+      details: null
+    });
+  } catch (err) {
+    const dbState = mongoose.connection.readyState;
+    const states = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting',
+      99: 'uninitialized'
+    };
+    
+    return res.status(503).json({
+      status: 'offline',
+      database: states[dbState] || 'unknown',
+      details: lastMongoError
+    });
+  }
 });
 
 // In-memory store for OTPs
