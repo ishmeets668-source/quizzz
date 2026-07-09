@@ -10,25 +10,34 @@ import History from './models/History.js';
 
 dotenv.config({ override: true });
 
+let lastMongoError = "Connection attempt not started yet.";
+
 // Connect to MongoDB (non-blocking server initialization)
 const mongoURI = process.env.MONGODB_URI;
 if (!mongoURI) {
+  lastMongoError = "MONGODB_URI environment variable is missing.";
   console.error("MONGODB_URI is not defined in the environment variables!");
   if (!process.env.VERCEL) {
     process.exit(1);
   }
 } else {
+  lastMongoError = "Connecting...";
   mongoose.connect(mongoURI)
-    .then(() => console.log('Successfully connected to MongoDB.'))
+    .then(() => {
+      console.log('Successfully connected to MongoDB.');
+      lastMongoError = null;
+    })
     .catch((err) => {
       console.error('Error connecting to MongoDB during startup:', err.message);
       console.error('The server will remain active but database operations will fail until connection is resolved.');
+      lastMongoError = err.message;
     });
 }
 
 // Listen to connection error events after initial connection
 mongoose.connection.on('error', (err) => {
   console.error('MongoDB connection error event:', err.message);
+  lastMongoError = err.message;
 });
 
 const app = express();
@@ -49,7 +58,8 @@ app.use((req, res, next) => {
 const checkDbConnection = (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
     return res.status(503).json({
-      error: 'Database connection is offline. Please make sure your IP is whitelisted on MongoDB Atlas and credentials are correct.'
+      error: 'Database connection is offline. Please make sure your IP is whitelisted on MongoDB Atlas and credentials are correct.',
+      details: lastMongoError
     });
   }
   next();
