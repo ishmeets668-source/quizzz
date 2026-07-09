@@ -68,6 +68,24 @@ const checkDbConnection = (req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
+// Endpoint: Check API and Database Status
+app.get('/api/status', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const states = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+    99: 'uninitialized'
+  };
+  
+  return res.status(dbState === 1 ? 200 : 503).json({
+    status: dbState === 1 ? 'online' : 'offline',
+    database: states[dbState] || 'unknown',
+    details: lastMongoError
+  });
+});
+
 // In-memory store for OTPs
 // key: email, value: { hashedOtp, expiresAt, attemptsRemaining, lastSentAt }
 const otpStore = {};
