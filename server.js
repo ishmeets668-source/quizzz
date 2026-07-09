@@ -14,15 +14,17 @@ dotenv.config({ override: true });
 const mongoURI = process.env.MONGODB_URI;
 if (!mongoURI) {
   console.error("MONGODB_URI is not defined in the environment variables!");
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
+} else {
+  mongoose.connect(mongoURI)
+    .then(() => console.log('Successfully connected to MongoDB.'))
+    .catch((err) => {
+      console.error('Error connecting to MongoDB during startup:', err.message);
+      console.error('The server will remain active but database operations will fail until connection is resolved.');
+    });
 }
-
-mongoose.connect(mongoURI)
-  .then(() => console.log('Successfully connected to MongoDB.'))
-  .catch((err) => {
-    console.error('Error connecting to MongoDB during startup:', err.message);
-    console.error('The server will remain active but database operations will fail until connection is resolved.');
-  });
 
 // Listen to connection error events after initial connection
 mongoose.connection.on('error', (err) => {
@@ -81,6 +83,11 @@ const setupTransporter = async () => {
       }
     });
   } else {
+    if (process.env.VERCEL) {
+      console.log("No SMTP configuration found on Vercel. Skipping Ethereal SMTP test account creation to avoid serverless function timeouts. Emails will fallback to dev console log.");
+      transporter = null;
+      return;
+    }
     console.log("No SMTP configuration found. Creating a test Ethereal SMTP account...");
     try {
       const testAccount = await nodemailer.createTestAccount();
