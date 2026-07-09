@@ -30,7 +30,7 @@ mongoose.connection.on('error', (err) => {
 });
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Database availability middleware
 const checkDbConnection = (req, res, next) => {
@@ -421,6 +421,10 @@ app.delete('/api/history', checkDbConnection, async (req, res) => {
 });
 
 
-app.listen(PORT, () => {
-  console.log(`Secure OTP Server running on http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Secure OTP Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
