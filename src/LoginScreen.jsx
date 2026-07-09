@@ -64,7 +64,8 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       }
 
       if (!response.ok) {
-        throw new Error(data.error || `Server error: ${response.status} ${response.statusText}`)
+        const errorMsg = data.error + (data.details ? ` (Details: ${data.details})` : '');
+        throw new Error(errorMsg);
       }
 
       if (playSfx) playSfx('complete', soundEnabled)
