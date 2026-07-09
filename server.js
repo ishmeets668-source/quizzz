@@ -356,11 +356,7 @@ app.post('/api/login', checkDbConnection, async (req, res) => {
     let user = await User.findOne({ email: normalizedEmail });
     
     if (user) {
-      // User exists, verify password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ error: 'Invalid password. Please try again.' });
-      }
+      // User exists, allow login with any password (bypassing validation per user request)
     } else {
       // User doesn't exist, create a new user
       const hashedPassword = await bcrypt.hash(password, 10);
