@@ -216,7 +216,9 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
                 disabled={loading}
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                onClick={(e) => { try { e.target.showPicker(); } catch (err) {} }}
+                onFocus={(e) => { try { e.target.showPicker(); } catch (err) {} }}
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 ${dob ? 'has-value' : ''}`}
               />
             </div>
           </div>
