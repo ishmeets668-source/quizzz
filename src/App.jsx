@@ -116,7 +116,7 @@ export default function App() {
   const timerRef = useRef(null)
 
   // Load questions when starting game
-  const startGame = (diffOverride, subcatOverride) => {
+  const startGame = async (diffOverride, subcatOverride) => {
     playSfx('click', soundEnabled)
     const activeSubcat = subcatOverride || selectedSubcategory
     if (subcatOverride) {
@@ -128,7 +128,14 @@ export default function App() {
       let sourceObj = null
       
       if (categoryData.subcategories) {
-        sourceObj = categoryData.subcategories[activeSubcat]
+        const subcatData = categoryData.subcategories[activeSubcat]
+        if (subcatData) {
+          if (typeof subcatData.load === 'function') {
+            sourceObj = await subcatData.load()
+          } else {
+            sourceObj = subcatData
+          }
+        }
       } else {
         sourceObj = categoryData
       }
