@@ -15,7 +15,58 @@
   </head>
   <body>
     <main>
-      <div id="root"></div>
+      <div id="root">
+        <!-- Static placeholder layout for instant paint / fast FCP -->
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: #FFFFFF; font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif; box-sizing: border-box;">
+          <div style="width: 100%; max-w: 36rem; display: flex; flex-direction: column; align-items: center; box-sizing: border-box;">
+            
+            <!-- Logo Placeholder -->
+            <div style="width: 80px; height: 80px; border-radius: 1.5rem; background: #ffffff; border: 1px solid #dbeafe; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center;">
+              <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="80" height="80" style="width: 100%; height: 100%; object-fit: contain; border-radius: 1.5rem;" />
+            </div>
+
+            <!-- Header Placeholder -->
+            <div style="text-align: center; margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%;">
+              <div style="height: 2.25rem; width: 260px; max-width: 80%; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; border-radius: 0.5rem; animation: loading-skeleton 1.5s infinite linear;"></div>
+              <div style="height: 1rem; width: 140px; max-width: 50%; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; border-radius: 0.25rem; animation: loading-skeleton 1.5s infinite linear;"></div>
+              <div style="width: 64px; height: 4px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 9999px; margin-top: 0.25rem;"></div>
+            </div>
+
+            <!-- Card Placeholder -->
+            <div style="width: 100%; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); box-sizing: border-box; display: flex; flex-direction: column; gap: 1.5rem;">
+              <!-- Card Title -->
+              <div style="height: 1.25rem; width: 120px; background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; border-radius: 0.25rem; animation: loading-skeleton 1.5s infinite linear; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 0.75rem;"></div>
+              
+              <!-- Inputs -->
+              <div style="display: flex; flex-direction: column; gap: 1.25rem; width: 100%;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <div style="height: 0.75rem; width: 100px; background: #e2e8f0; border-radius: 0.25rem;"></div>
+                  <div style="height: 2.75rem; width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <div style="height: 0.75rem; width: 80px; background: #e2e8f0; border-radius: 0.25rem;"></div>
+                  <div style="height: 2.75rem; width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <div style="height: 0.75rem; width: 90px; background: #e2e8f0; border-radius: 0.25rem;"></div>
+                  <div style="height: 2.75rem; width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;"></div>
+                </div>
+              </div>
+
+              <!-- Button -->
+              <div style="height: 3rem; width: 100%; background: linear-gradient(90deg, #bfdbfe, #93c5fd, #bfdbfe); background-size: 200% 100%; border-radius: 0.75rem; animation: loading-skeleton 1.5s infinite linear; margin-top: 0.5rem;"></div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <style>
+          @keyframes loading-skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        </style>
+      </div>
     </main>
     <script type="module" src="/src/main.jsx"></script>
   </body>
