@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const [timing, setTiming] = useState('')
+  const [dob, setDob] = useState('')
   const [loading, setLoading] = useState(false)
   const [notification, setNotification] = useState(null) // { type: 'success' | 'error', text: '' }
   const [isSuccessState, setIsSuccessState] = useState(false)
@@ -14,7 +14,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
     return phoneRegex.test(phoneVal.trim())
   }
 
-  const isFormValid = name.trim().length >= 2 && validatePhone(phone) && timing.trim().length >= 3
+  const isFormValid = name.trim().length >= 2 && validatePhone(phone) && dob.trim().length >= 6
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault()
@@ -34,8 +34,8 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       return
     }
 
-    if (timing.trim().length < 3) {
-      setNotification({ type: 'error', text: 'Timing must be at least 3 characters.' })
+    if (dob.trim().length < 6) {
+      setNotification({ type: 'error', text: 'Date of Birth must be at least 6 characters.' })
       if (playSfx) playSfx('incorrect', soundEnabled)
       return
     }
@@ -52,7 +52,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.trim(),
-          timing: timing.trim()
+          dob: dob.trim()
         })
       });
 
@@ -63,8 +63,9 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       }
 
       if (!response.ok) {
-        const errorMsg = data.error + (data.details ? ` (Details: ${data.details})` : '');
-        throw new Error(errorMsg);
+        const baseMsg = data.error || response.statusText || 'Failed to login. Please try again.';
+        const detailsMsg = data.details ? ` (Details: ${data.details})` : '';
+        throw new Error(baseMsg + detailsMsg);
       }
 
       if (playSfx) playSfx('complete', soundEnabled)
@@ -200,23 +201,23 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
             </div>
           </div>
 
-          {/* Timing input field */}
+          {/* Date of Birth input field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
-              Batch Timing
+              Date of Birth (D.O.B)
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </span>
               <input
                 type="text"
                 disabled={loading}
-                value={timing}
-                onChange={(e) => setTiming(e.target.value)}
-                placeholder="e.g. 10:00 AM - 12:00 PM"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                placeholder="e.g. 15/08/2000"
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
             </div>

@@ -329,10 +329,10 @@ app.post('/api/verify-otp', (req, res) => {
 
 // Endpoint: Direct Password Login
 app.post('/api/login', checkDbConnection, async (req, res) => {
-  const { name, phone, timing } = req.body;
+  const { name, phone, dob } = req.body;
 
-  if (!name || !phone || !timing) {
-    return res.status(400).json({ error: 'Name, phone number, and timing are required.' });
+  if (!name || !phone || !dob) {
+    return res.status(400).json({ error: 'Name, phone number, and Date of Birth are required.' });
   }
 
   const phoneRegex = /^\d{10}$/;
@@ -344,8 +344,8 @@ app.post('/api/login', checkDbConnection, async (req, res) => {
     return res.status(400).json({ error: 'Name must be at least 2 characters.' });
   }
 
-  if (timing.trim().length < 3) {
-    return res.status(400).json({ error: 'Timing must be at least 3 characters.' });
+  if (dob.trim().length < 6) {
+    return res.status(400).json({ error: 'Date of Birth must be at least 6 characters.' });
   }
 
   try {
@@ -361,7 +361,7 @@ app.post('/api/login', checkDbConnection, async (req, res) => {
       user = new User({
         name: name.trim(),
         phone: normalizedPhone,
-        timing: timing.trim()
+        dob: dob.trim()
       });
       await user.save();
     }

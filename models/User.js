@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
-  timing: {
+  dob: {
     type: String,
     required: true,
     trim: true
