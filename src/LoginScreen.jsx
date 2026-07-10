@@ -87,7 +87,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       <div className="w-full animate-fade-in flex flex-col items-center py-12 text-center space-y-6">
         {/* Logo container */}
         <div className="w-24 h-24 rounded-3xl bg-real-white shadow-2xl hover:scale-105 transition-transform duration-300 overflow-hidden border border-blue-100 flex items-center justify-center p-2 mb-2">
-          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="96" height="96" className="w-full h-full object-contain animate-pulse" />
+          <img src="/iccvs_logo.webp" alt="ICCVS Logo" width="96" height="96" className="w-full h-full object-contain animate-pulse" />
         </div>
         
         <div className="space-y-3 max-w-sm px-4 text-slate-800">
@@ -119,7 +119,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
     <div className="w-full animate-fade-in flex flex-col items-center py-6">
       {/* Logo container */}
       <div className="w-20 h-20 rounded-3xl bg-white shadow-xl hover:scale-105 transition-transform duration-300 overflow-hidden border border-blue-100 flex items-center justify-center p-1.5 mb-6">
-        <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="80" height="80" className="w-full h-full object-contain" />
+        <img src="/iccvs_logo.webp" alt="ICCVS Logo" width="80" height="80" className="w-full h-full object-contain" />
       </div>
 
       <div className="text-center space-y-2 mb-6 max-w-sm">

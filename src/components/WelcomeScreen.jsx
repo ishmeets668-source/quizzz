@@ -301,7 +301,7 @@ export default function WelcomeScreen({
 
       <div className="text-center relative space-y-2">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-[0_8px_24px_rgba(124,58,237,0.15)] mb-0.5 hover:scale-105 transition-transform duration-300 overflow-hidden border border-purple-100/30">
-          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="56" height="56" className="w-full h-full object-contain p-1" />
+          <img src="/iccvs_logo.webp" alt="ICCVS Logo" width="56" height="56" className="w-full h-full object-contain p-1" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-black tracking-wide bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent select-none pb-0.5">
           Mock Test

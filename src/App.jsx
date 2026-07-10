@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import LoginScreen from './LoginScreen'
-import WelcomeScreen from './components/WelcomeScreen'
-import CandidateNameScreen from './components/CandidateNameScreen'
-import PlayingScreen from './components/PlayingScreen'
-import ResultsScreen from './components/ResultsScreen'
-import HistoryScreen from './components/HistoryScreen'
-import LogoutConfirmDialog from './components/LogoutConfirmDialog'
 import { playSfx } from './utils/sfx'
 import { shuffleArray } from './utils/helpers'
 import { QUESTION_BANK } from './data/questionBank'
+
+const WelcomeScreen = lazy(() => import('./components/WelcomeScreen'))
+const CandidateNameScreen = lazy(() => import('./components/CandidateNameScreen'))
+const PlayingScreen = lazy(() => import('./components/PlayingScreen'))
+const ResultsScreen = lazy(() => import('./components/ResultsScreen'))
+const HistoryScreen = lazy(() => import('./components/HistoryScreen'))
+const LogoutConfirmDialog = lazy(() => import('./components/LogoutConfirmDialog'))
 
 export default function App() {
   const [candidateName, setCandidateName] = useState(() => {
@@ -370,7 +371,12 @@ export default function App() {
             playSfx={playSfx}
           />
         ) : (
-          <>
+          <Suspense fallback={
+            <div className="w-full glass-panel rounded-3xl p-8 border border-white/10 shadow-[0_15px_35px_rgba(30,41,59,0.06)] flex flex-col items-center justify-center space-y-4 py-16">
+              <div className="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">Loading Panel...</span>
+            </div>
+          }>
             {gameState === 'WELCOME_LANGUAGE' && (
               <WelcomeScreen
                 candidateName={candidateName}
@@ -442,24 +448,26 @@ export default function App() {
                 playSfx={playSfx}
               />
             )}
-          </>
+          </Suspense>
         )}
       </div>
 
       {showLogoutConfirm && (
-        <LogoutConfirmDialog
-          onConfirm={() => {
-            localStorage.removeItem('quiz_session')
-            setIsLoggedIn(false)
-            setCandidateName('')
-            setCandidatePhone('')
-            setShowLogoutConfirm(false)
-            setGameState('WELCOME_LANGUAGE')
-          }}
-          onCancel={() => setShowLogoutConfirm(false)}
-          soundEnabled={soundEnabled}
-          playSfx={playSfx}
-        />
+        <Suspense fallback={null}>
+          <LogoutConfirmDialog
+            onConfirm={() => {
+              localStorage.removeItem('quiz_session')
+              setIsLoggedIn(false)
+              setCandidateName('')
+              setCandidatePhone('')
+              setShowLogoutConfirm(false)
+              setGameState('WELCOME_LANGUAGE')
+            }}
+            onCancel={() => setShowLogoutConfirm(false)}
+            soundEnabled={soundEnabled}
+            playSfx={playSfx}
+          />
+        </Suspense>
       )}
     </div>
   )
