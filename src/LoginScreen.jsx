@@ -2,20 +2,19 @@ import React, { useState } from 'react'
 
 export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const [phone, setPhone] = useState('')
+  const [timing, setTiming] = useState('')
   const [loading, setLoading] = useState(false)
   const [notification, setNotification] = useState(null) // { type: 'success' | 'error', text: '' }
   const [isSuccessState, setIsSuccessState] = useState(false)
 
-  // Email format validation helper
-  const validateEmail = (emailVal) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(emailVal.trim())
+  // Phone number format validation helper (exactly 10 digits)
+  const validatePhone = (phoneVal) => {
+    const phoneRegex = /^\d{10}$/
+    return phoneRegex.test(phoneVal.trim())
   }
 
-  const isFormValid = name.trim().length >= 2 && validateEmail(email) && password.length >= 6
+  const isFormValid = name.trim().length >= 2 && validatePhone(phone) && timing.trim().length >= 3
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault()
@@ -29,14 +28,14 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       return
     }
 
-    if (!validateEmail(email)) {
-      setNotification({ type: 'error', text: 'Please enter a valid email address.' })
+    if (!validatePhone(phone)) {
+      setNotification({ type: 'error', text: 'Please enter a valid 10-digit phone number.' })
       if (playSfx) playSfx('incorrect', soundEnabled)
       return
     }
 
-    if (password.length < 6) {
-      setNotification({ type: 'error', text: 'Password must be at least 6 characters.' })
+    if (timing.trim().length < 3) {
+      setNotification({ type: 'error', text: 'Timing must be at least 3 characters.' })
       if (playSfx) playSfx('incorrect', soundEnabled)
       return
     }
@@ -52,8 +51,8 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
         },
         body: JSON.stringify({
           name: name.trim(),
-          email: email.trim(),
-          password
+          phone: phone.trim(),
+          timing: timing.trim()
         })
       });
 
@@ -72,7 +71,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       setIsSuccessState(true)
       
       setTimeout(() => {
-        onLoginSuccess(data.session.name, data.session.email)
+        onLoginSuccess(data.session.name, data.session.phone)
       }, 1500)
     } catch (error) {
       setNotification({ type: 'error', text: error.message })
@@ -179,66 +178,47 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
             </div>
           </div>
 
-          {/* Email input field */}
+          {/* Phone Number input field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
-              Email Address
+              Phone Number
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </span>
               <input
-                type="email"
+                type="tel"
                 disabled={loading}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="Enter 10-digit phone number"
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
             </div>
           </div>
 
-          {/* Password input field */}
+          {/* Timing input field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
-              Password
+              Batch Timing
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </span>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type="text"
                 disabled={loading}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-11 pr-10 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                value={timing}
+                onChange={(e) => setTiming(e.target.value)}
+                placeholder="e.g. 10:00 AM - 12:00 PM"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
-              <button
-                type="button"
-                onClick={() => {
-                  if (playSfx) playSfx('click', soundEnabled)
-                  setShowPassword(!showPassword)
-                }}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer border-none bg-transparent"
-              >
-                {showPassword ? (
-                  <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                  </svg>
-                ) : (
-                  <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )}
-              </button>
             </div>
           </div>
 

@@ -19,10 +19,10 @@ export default function App() {
       return ''
     }
   })
-  const [candidateEmail, setCandidateEmail] = useState(() => {
+  const [candidatePhone, setCandidatePhone] = useState(() => {
     try {
       const sess = JSON.parse(localStorage.getItem('quiz_session'))
-      return sess ? sess.email : ''
+      return sess ? sess.phone : ''
     } catch {
       return ''
     }
@@ -63,8 +63,8 @@ export default function App() {
 
   // Fetch history from MongoDB
   useEffect(() => {
-    if (isLoggedIn && candidateEmail) {
-      fetch(`/api/history?email=${encodeURIComponent(candidateEmail)}`)
+    if (isLoggedIn && candidatePhone) {
+      fetch(`/api/history?phone=${encodeURIComponent(candidatePhone)}`)
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch history');
           return res.json();
@@ -76,11 +76,11 @@ export default function App() {
         })
         .catch(err => console.error("Error fetching history from MongoDB:", err));
     }
-  }, [isLoggedIn, candidateEmail]);
+  }, [isLoggedIn, candidatePhone]);
 
   // Delete a history record
   const handleDeleteRecord = (id) => {
-    fetch(`/api/history/${id}?email=${encodeURIComponent(candidateEmail)}`, {
+    fetch(`/api/history/${id}?phone=${encodeURIComponent(candidatePhone)}`, {
       method: 'DELETE'
     })
     .then(res => {
@@ -97,7 +97,7 @@ export default function App() {
 
   // Clear all history records for candidate
   const handleClearAllHistory = () => {
-    fetch(`/api/history?email=${encodeURIComponent(candidateEmail)}`, {
+    fetch(`/api/history?phone=${encodeURIComponent(candidatePhone)}`, {
       method: 'DELETE'
     })
     .then(res => {
@@ -315,7 +315,7 @@ export default function App() {
         },
         body: JSON.stringify({
           ...newRecord,
-          email: candidateEmail
+          phone: candidatePhone
         })
       })
       .then(res => {
@@ -352,10 +352,10 @@ export default function App() {
       <div className="w-full max-w-xl transition-all duration-500 animate-slide-up relative z-10">
         {!isLoggedIn ? (
           <LoginScreen
-            onLoginSuccess={(name, email) => {
+            onLoginSuccess={(name, phone) => {
               setCandidateName(name)
-              setCandidateEmail(email)
-              localStorage.setItem('quiz_session', JSON.stringify({ name, email }))
+              setCandidatePhone(phone)
+              localStorage.setItem('quiz_session', JSON.stringify({ name, phone }))
               setIsLoggedIn(true)
               setGameState('WELCOME_LANGUAGE')
             }}
@@ -367,7 +367,7 @@ export default function App() {
             {gameState === 'WELCOME_LANGUAGE' && (
               <WelcomeScreen
                 candidateName={candidateName}
-                candidateEmail={candidateEmail}
+                candidatePhone={candidatePhone}
                 onLogout={() => setShowLogoutConfirm(true)}
                 onSelectSubject={(key) => {
                   startGame('easy', key)
@@ -445,7 +445,7 @@ export default function App() {
             localStorage.removeItem('quiz_session')
             setIsLoggedIn(false)
             setCandidateName('')
-            setCandidateEmail('')
+            setCandidatePhone('')
             setShowLogoutConfirm(false)
             setGameState('WELCOME_LANGUAGE')
           }}

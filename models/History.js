@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
 
 const HistorySchema = new mongoose.Schema({
-  email: {
+  phone: {
     type: String,
     required: true,
     trim: true,
-    lowercase: true,
     index: true
   },
   name: {

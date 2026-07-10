@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 
 export default function WelcomeScreen({
   candidateName,
-  candidateEmail,
+  candidatePhone,
   onLogout,
   onSelectSubject,
   onViewHistory,
@@ -281,7 +281,7 @@ export default function WelcomeScreen({
           </div>
           <div className="text-left hidden sm:block">
             <p className="text-[10px] font-black text-slate-700 leading-none">{candidateName}</p>
-            <p className="text-[8px] font-medium text-slate-400 leading-none mt-0.5">{candidateEmail}</p>
+            <p className="text-[8px] font-medium text-slate-400 leading-none mt-0.5">{candidatePhone}</p>
           </div>
           <button
             onClick={() => {

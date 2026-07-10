@@ -4,7 +4,6 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import User from './models/User.js';
 import History from './models/History.js';
 
@@ -330,40 +329,39 @@ app.post('/api/verify-otp', (req, res) => {
 
 // Endpoint: Direct Password Login
 app.post('/api/login', checkDbConnection, async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, phone, timing } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Name, email, and password are required.' });
+  if (!name || !phone || !timing) {
+    return res.status(400).json({ error: 'Name, phone number, and timing are required.' });
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  const phoneRegex = /^\d{10}$/;
+  if (!phoneRegex.test(phone.trim())) {
+    return res.status(400).json({ error: 'Please enter a valid 10-digit phone number.' });
   }
 
   if (name.trim().length < 2) {
     return res.status(400).json({ error: 'Name must be at least 2 characters.' });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  if (timing.trim().length < 3) {
+    return res.status(400).json({ error: 'Timing must be at least 3 characters.' });
   }
 
   try {
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPhone = phone.trim();
     
     // Check if user exists
-    let user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ phone: normalizedPhone });
     
     if (user) {
-      // User exists, allow login with any password (bypassing validation per user request)
+      // User exists, allow login
     } else {
       // User doesn't exist, create a new user
-      const hashedPassword = await bcrypt.hash(password, 10);
       user = new User({
         name: name.trim(),
-        email: normalizedEmail,
-        password: hashedPassword
+        phone: normalizedPhone,
+        timing: timing.trim()
       });
       await user.save();
     }
@@ -376,7 +374,7 @@ app.post('/api/login', checkDbConnection, async (req, res) => {
       message: 'Login successful.',
       session: {
         token: sessionToken,
-        email: user.email,
+        phone: user.phone,
         name: user.name,
         loggedInAt: Date.now()
       }
@@ -389,15 +387,15 @@ app.post('/api/login', checkDbConnection, async (req, res) => {
 
 // Endpoint: Get History for a user
 app.get('/api/history', checkDbConnection, async (req, res) => {
-  const { email } = req.query;
+  const { phone } = req.query;
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required to fetch history.' });
+  if (!phone) {
+    return res.status(400).json({ error: 'Phone number is required to fetch history.' });
   }
 
   try {
-    const normalizedEmail = email.trim().toLowerCase();
-    const history = await History.find({ email: normalizedEmail }).sort({ id: -1 });
+    const normalizedPhone = phone.trim();
+    const history = await History.find({ phone: normalizedPhone }).sort({ id: -1 });
     return res.status(200).json({ success: true, history });
   } catch (error) {
     console.error('Error fetching history:', error);
@@ -407,16 +405,16 @@ app.get('/api/history', checkDbConnection, async (req, res) => {
 
 // Endpoint: Save new History entry
 app.post('/api/history', checkDbConnection, async (req, res) => {
-  const { email, name, subject, difficulty, totalQuestions, score, percentage, status, dateTime, id } = req.body;
+  const { phone, name, subject, difficulty, totalQuestions, score, percentage, status, dateTime, id } = req.body;
 
-  if (!email || !name || !subject || !difficulty || totalQuestions === undefined || score === undefined || percentage === undefined || !status || !dateTime || id === undefined) {
+  if (!phone || !name || !subject || !difficulty || totalQuestions === undefined || score === undefined || percentage === undefined || !status || !dateTime || id === undefined) {
     return res.status(400).json({ error: 'Missing required history parameters.' });
   }
 
   try {
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPhone = phone.trim();
     const newRecord = new History({
-      email: normalizedEmail,
+      phone: normalizedPhone,
       name: name.trim(),
       subject,
       difficulty,
@@ -431,7 +429,7 @@ app.post('/api/history', checkDbConnection, async (req, res) => {
     await newRecord.save();
     
     // Fetch and return the updated history for the user
-    const history = await History.find({ email: normalizedEmail }).sort({ id: -1 });
+    const history = await History.find({ phone: normalizedPhone }).sort({ id: -1 });
     return res.status(200).json({ success: true, message: 'Record saved successfully.', history });
   } catch (error) {
     console.error('Error saving history record:', error);
@@ -442,15 +440,15 @@ app.post('/api/history', checkDbConnection, async (req, res) => {
 // Endpoint: Delete a single History entry by numeric ID
 app.delete('/api/history/:id', checkDbConnection, async (req, res) => {
   const { id } = req.params;
-  const { email } = req.query;
+  const { phone } = req.query;
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required to delete history.' });
+  if (!phone) {
+    return res.status(400).json({ error: 'Phone number is required to delete history.' });
   }
 
   try {
-    const normalizedEmail = email.trim().toLowerCase();
-    const result = await History.deleteOne({ id: parseInt(id), email: normalizedEmail });
+    const normalizedPhone = phone.trim();
+    const result = await History.deleteOne({ id: parseInt(id), phone: normalizedPhone });
     
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: 'Record not found or not owned by you.' });
@@ -465,15 +463,15 @@ app.delete('/api/history/:id', checkDbConnection, async (req, res) => {
 
 // Endpoint: Clear all History entries for a user
 app.delete('/api/history', checkDbConnection, async (req, res) => {
-  const { email } = req.query;
+  const { phone } = req.query;
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required to clear history.' });
+  if (!phone) {
+    return res.status(400).json({ error: 'Phone number is required to clear history.' });
   }
 
   try {
-    const normalizedEmail = email.trim().toLowerCase();
-    await History.deleteMany({ email: normalizedEmail });
+    const normalizedPhone = phone.trim();
+    await History.deleteMany({ phone: normalizedPhone });
     return res.status(200).json({ success: true, message: 'All history cleared successfully.' });
   } catch (error) {
     console.error('Error clearing history:', error);
