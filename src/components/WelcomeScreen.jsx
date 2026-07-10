@@ -40,7 +40,7 @@ export default function WelcomeScreen({
       key: 'basic', 
       title: 'Basic', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
           <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -56,7 +56,7 @@ export default function WelcomeScreen({
       key: 'accounting', 
       title: 'Accountancy', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <line x1="18" y1="20" x2="18" y2="10" />
           <line x1="12" y1="20" x2="12" y2="4" />
           <line x1="6" y1="20" x2="6" y2="14" />
@@ -79,7 +79,7 @@ export default function WelcomeScreen({
       key: 'graphic_design', 
       title: 'Graphic Design', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22Z" />
           <circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"/>
           <circle cx="11.5" cy="7.5" r="1.5" fill="currentColor"/>
@@ -103,7 +103,7 @@ export default function WelcomeScreen({
       key: 'web_design', 
       title: 'ADIT/A level', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
           <line x1="2" y1="8" x2="22" y2="8" />
           <line x1="6" y1="21" x2="18" y2="21" />
@@ -135,7 +135,7 @@ export default function WelcomeScreen({
       key: 'professional', 
       title: 'Professional Courses', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
           <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
         </svg>
@@ -156,7 +156,7 @@ export default function WelcomeScreen({
       key: 'digital_marketing', 
       title: 'Digital Marketing', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 19l7-7 3 3-7 7-3-3z" />
           <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
           <path d="M2 2l7.5 1.5" />
@@ -180,7 +180,7 @@ export default function WelcomeScreen({
       key: 'adv_excel', 
       title: 'Adv. Excel', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
           <line x1="9" y1="3" x2="9" y2="21" />
           <line x1="3" y1="9" x2="21" y2="9" />
@@ -203,7 +203,7 @@ export default function WelcomeScreen({
       key: 'diploma', 
       title: 'Diploma', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
           <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
         </svg>
@@ -225,7 +225,7 @@ export default function WelcomeScreen({
       key: 'data_analyst', 
       title: 'Data Analyst', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
           <path d="M22 12A10 10 0 0 0 12 2v10z" />
         </svg>
@@ -250,7 +250,7 @@ export default function WelcomeScreen({
       key: 'other', 
       title: 'Other Course', 
       icon: (
-        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />
           <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
         </svg>
@@ -280,18 +280,19 @@ export default function WelcomeScreen({
             {candidateName ? candidateName.charAt(0).toUpperCase() : 'U'}
           </div>
           <div className="text-left hidden sm:block">
-            <p className="text-[10px] font-black text-slate-700 leading-none">{candidateName}</p>
-            <p className="text-[8px] font-medium text-slate-400 leading-none mt-0.5">{candidatePhone}</p>
+            <p className="text-xs font-black text-slate-700 leading-none">{candidateName}</p>
+            <p className="text-[10px] font-medium text-slate-600 leading-none mt-0.5">{candidatePhone}</p>
           </div>
           <button
             onClick={() => {
               if (playSfx) playSfx('click', soundEnabled)
               onLogout()
             }}
-            className="p-1 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors cursor-pointer ml-1"
+            className="p-1 rounded-lg hover:bg-red-50 text-slate-600 hover:text-red-600 transition-colors cursor-pointer ml-1"
             title="Logout"
+            aria-label="Logout"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
           </button>
@@ -300,24 +301,24 @@ export default function WelcomeScreen({
 
       <div className="text-center relative space-y-2">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-[0_8px_24px_rgba(124,58,237,0.15)] mb-0.5 hover:scale-105 transition-transform duration-300 overflow-hidden border border-purple-100/30">
-          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" className="w-full h-full object-contain p-1" />
+          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="56" height="56" className="w-full h-full object-contain p-1" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-black tracking-wide bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent select-none pb-0.5">
           Mock Test
         </h1>
-        <p className="text-[9px] text-slate-400 font-bold max-w-sm mx-auto uppercase tracking-widest">
+        <p className="text-[10px] text-slate-600 font-bold max-w-sm mx-auto uppercase tracking-widest">
           Design by Ishmeet Singh / Rishi Biswas
         </p>
         <div className="w-10 h-0.5 bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 mx-auto rounded-full mt-1"></div>
-        <p className="text-[11px] text-slate-500/80 font-bold max-w-xs mx-auto leading-relaxed mt-1">
+        <p className="text-xs text-slate-700 font-bold max-w-xs mx-auto leading-relaxed mt-1">
           Our Target Your Success
         </p>
       </div>
 
       <div className="mt-4 space-y-3">
-        <label className="text-[9px] font-bold tracking-widest text-slate-400 uppercase block text-center mb-1">
+        <h2 className="text-[10px] font-bold tracking-widest text-slate-600 uppercase block text-center mb-1">
           Select a Subject to Begin
-        </label>
+        </h2>
         
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {subjects.map((item) => (
@@ -330,6 +331,8 @@ export default function WelcomeScreen({
                     selectSubject(item.key)
                   }
                 }}
+                aria-haspopup={item.hasDropdown ? "true" : undefined}
+                aria-expanded={item.hasDropdown ? (activeDropdown === item.key) : undefined}
                 className={`w-full py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-left border bg-gradient-to-br ${item.gradient} ${item.border} transition-all duration-300 flex items-center justify-between gap-1.5 group cursor-pointer hover:-translate-y-0.5 shadow-sm hover:shadow-md`}
               >
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -340,7 +343,7 @@ export default function WelcomeScreen({
                     {item.title}
                   </span>
                 </div>
-                {item.hasDropdown && <span className="text-[9px] text-slate-400 mr-0.5 select-none">▼</span>}
+                {item.hasDropdown && <span className="text-[9px] text-slate-600 mr-0.5 select-none">▼</span>}
               </button>
 
               {item.hasDropdown && activeDropdown === item.key && (
@@ -389,7 +392,7 @@ export default function WelcomeScreen({
             if (playSfx) playSfx('click', soundEnabled)
             onViewHistory()
           }}
-          className="w-full py-3.5 rounded-2xl bg-[#f1f0fb] hover:bg-[#e8e6f7] text-[#5c548f] hover:text-[#4d4580] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border border-[#e2e0f2] shadow-sm font-semibold text-xs tracking-wider"
+          className="w-full py-3.5 rounded-2xl bg-[#f1f0fb] hover:bg-[#e8e6f7] text-[#3f3967] hover:text-[#2d294d] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border border-[#e2e0f2] shadow-sm font-semibold text-xs tracking-wider"
         >
           <span>📜 View Quiz History</span>
         </button>

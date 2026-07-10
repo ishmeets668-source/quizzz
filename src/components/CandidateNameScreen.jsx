@@ -133,10 +133,11 @@ export default function CandidateNameScreen({
       {/* Input field */}
       <div className="space-y-3 relative z-10">
         <div>
-          <label className="text-xs font-semibold tracking-wider text-white/50 uppercase block pl-1 mb-1.5">
+          <label htmlFor="confirm-candidate-name" className="text-xs font-semibold tracking-wider text-white/70 uppercase block pl-1 mb-1.5">
             Candidate Name
           </label>
           <input
+            id="confirm-candidate-name"
             type="text"
             value={candidateName}
             onChange={(e) => setCandidateName(e.target.value)}

@@ -87,9 +87,9 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
       <div className="w-full animate-fade-in flex flex-col items-center py-12 text-center space-y-6">
         {/* Logo container */}
         <div className="w-24 h-24 rounded-3xl bg-real-white shadow-2xl hover:scale-105 transition-transform duration-300 overflow-hidden border border-blue-100 flex items-center justify-center p-2 mb-2">
-          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" className="w-full h-full object-contain animate-pulse" />
+          <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="96" height="96" className="w-full h-full object-contain animate-pulse" />
         </div>
-
+        
         <div className="space-y-3 max-w-sm px-4 text-slate-800">
           <h2 className="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent leading-tight">
             Welcome, {name}!
@@ -119,7 +119,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
     <div className="w-full animate-fade-in flex flex-col items-center py-6">
       {/* Logo container */}
       <div className="w-20 h-20 rounded-3xl bg-white shadow-xl hover:scale-105 transition-transform duration-300 overflow-hidden border border-blue-100 flex items-center justify-center p-1.5 mb-6">
-        <img src="/iccvs_logo.jpg" alt="ICCVS Logo" className="w-full h-full object-contain" />
+        <img src="/iccvs_logo.jpg" alt="ICCVS Logo" width="80" height="80" className="w-full h-full object-contain" />
       </div>
 
       <div className="text-center space-y-2 mb-6 max-w-sm">
@@ -158,16 +158,17 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
 
           {/* Name input field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
+            <label htmlFor="candidate-name" className="text-xs font-bold text-slate-600 uppercase tracking-wide block pl-1">
               Candidate Full Name
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </span>
               <input
+                id="candidate-name"
                 type="text"
                 disabled={loading}
                 value={name}
@@ -180,16 +181,17 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
 
           {/* Phone Number input field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
+            <label htmlFor="phone-number" className="text-xs font-bold text-slate-600 uppercase tracking-wide block pl-1">
               Phone Number
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </span>
               <input
+                id="phone-number"
                 type="tel"
                 disabled={loading}
                 value={phone}
@@ -202,16 +204,17 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
 
           {/* Date of Birth input field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
+            <label htmlFor="date-of-birth" className="text-xs font-bold text-slate-600 uppercase tracking-wide block pl-1">
               Date of Birth
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </span>
               <input
+                id="date-of-birth"
                 type="date"
                 disabled={loading}
                 value={dob}
@@ -234,7 +237,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4.5 w-4.5 text-blue-600" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
@@ -243,7 +246,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
             ) : (
               <>
                 <span>Login</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </>

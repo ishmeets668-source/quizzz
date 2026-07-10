@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  --font-sans: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
   --color-brand-white: #1e293b;
   --color-brand-red: #dc2626;
   --color-brand-yellow: #d97706;
@@ -71,34 +72,34 @@
   color: #1e293b !important;
 }
 .text-white\/90 {
-  color: rgba(30, 41, 59, 0.9) !important;
+  color: rgba(30, 41, 59, 0.95) !important;
 }
 .text-white\/80 {
-  color: rgba(30, 41, 59, 0.8) !important;
+  color: rgba(30, 41, 59, 0.9) !important;
 }
 .text-white\/70 {
-  color: rgba(30, 41, 59, 0.7) !important;
+  color: rgba(30, 41, 59, 0.82) !important;
 }
 .text-white\/60 {
-  color: rgba(30, 41, 59, 0.6) !important;
+  color: rgba(30, 41, 59, 0.76) !important;
 }
 .text-white\/50 {
-  color: rgba(30, 41, 59, 0.5) !important;
+  color: rgba(30, 41, 59, 0.72) !important;
 }
 .text-white\/45 {
-  color: rgba(30, 41, 59, 0.45) !important;
+  color: rgba(30, 41, 59, 0.7) !important;
 }
 .text-white\/40 {
-  color: rgba(30, 41, 59, 0.4) !important;
+  color: rgba(30, 41, 59, 0.68) !important;
 }
 .text-white\/30 {
-  color: rgba(30, 41, 59, 0.3) !important;
+  color: rgba(30, 41, 59, 0.58) !important;
 }
 .text-white\/20 {
-  color: rgba(30, 41, 59, 0.2) !important;
+  color: rgba(30, 41, 59, 0.52) !important;
 }
 .text-white\/10 {
-  color: rgba(30, 41, 59, 0.1) !important;
+  color: rgba(30, 41, 59, 0.25) !important;
 }
 
 /* Redefine white background utility classes to transparent dark overlays */
