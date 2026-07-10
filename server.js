@@ -4,10 +4,16 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import User from './models/User.js';
 import History from './models/History.js';
 
-dotenv.config({ override: true });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '.env'), override: true });
+dotenv.config({ path: path.resolve(__dirname, '.env.local'), override: true });
 
 let lastMongoError = "Connection attempt not started yet.";
 let dbConnectionPromise = null;

@@ -70,7 +70,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
 
       if (playSfx) playSfx('complete', soundEnabled)
       setIsSuccessState(true)
-      
+
       setTimeout(() => {
         onLoginSuccess(data.session.name, data.session.phone)
       }, 1500)
@@ -140,11 +140,10 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
 
         {/* Dynamic Alert Banner */}
         {notification && (
-          <div className={`p-4 mb-5 rounded-2xl border text-xs font-semibold animate-fade-in flex items-start gap-2.5 ${
-            notification.type === 'success' 
-              ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' 
+          <div className={`p-4 mb-5 rounded-2xl border text-xs font-semibold animate-fade-in flex items-start gap-2.5 ${notification.type === 'success'
+              ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20'
               : 'bg-rose-500/10 text-rose-700 border-rose-500/20'
-          }`}>
+            }`}>
             <span className="text-sm">{notification.type === 'success' ? '✓' : '⚠️'}</span>
             <span className="leading-relaxed">{notification.text}</span>
           </div>
@@ -204,7 +203,7 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
           {/* Date of Birth input field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide block pl-1">
-              Date of Birth (D.O.B)
+              Date of Birth
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
@@ -213,11 +212,10 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
                 </svg>
               </span>
               <input
-                type="text"
+                type="date"
                 disabled={loading}
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
-                placeholder="e.g. 15/08/2000"
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200/80 bg-white/20 focus:bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
             </div>
@@ -227,11 +225,10 @@ export default function LoginScreen({ onLoginSuccess, soundEnabled, playSfx }) {
           <button
             type="submit"
             disabled={loading || !isFormValid}
-            className={`w-full py-3 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 border border-transparent ${
-              !isFormValid || loading
+            className={`w-full py-3 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 border border-transparent ${!isFormValid || loading
                 ? 'bg-slate-200/60 text-slate-400 cursor-not-allowed shadow-none'
                 : 'bg-blue-600 hover:bg-blue-700 text-real-white shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 active:scale-[0.99] cursor-pointer'
-            }`}
+              }`}
           >
             {loading ? (
               <>
