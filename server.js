@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import User from './models/User.js';
 import History from './models/History.js';
@@ -14,6 +15,29 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '.env'), override: true });
 dotenv.config({ path: path.resolve(__dirname, '.env.local'), override: true });
+
+const LOCAL_DB_PATH = path.resolve(__dirname, 'local_db.json');
+
+const readLocalDb = () => {
+  try {
+    if (!fs.existsSync(LOCAL_DB_PATH)) {
+      return { users: [], history: [] };
+    }
+    const data = fs.readFileSync(LOCAL_DB_PATH, 'utf8');
+    return JSON.parse(data || '{"users":[],"history":[]}');
+  } catch (err) {
+    console.error("Error reading local DB:", err);
+    return { users: [], history: [] };
+  }
+};
+
+const writeLocalDb = (data) => {
+  try {
+    fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error("Error writing local DB:", err);
+  }
+};
 
 let lastMongoError = "Connection attempt not started yet.";
 let dbConnectionPromise = null;
@@ -71,12 +95,12 @@ app.use((req, res, next) => {
 const checkDbConnection = async (req, res, next) => {
   try {
     await ensureDbConnected();
+    req.useLocalFallback = false;
     next();
   } catch (err) {
-    return res.status(503).json({
-      error: 'Database connection is offline. Please make sure your IP is whitelisted on MongoDB Atlas and credentials are correct.',
-      details: lastMongoError
-    });
+    console.warn("MongoDB connection failed. Enabling local JSON database fallback. Error:", err.message);
+    req.useLocalFallback = true;
+    next();
   }
 };
 
@@ -93,18 +117,9 @@ app.get('/api/status', async (req, res) => {
       details: null
     });
   } catch (err) {
-    const dbState = mongoose.connection.readyState;
-    const states = {
-      0: 'disconnected',
-      1: 'connected',
-      2: 'connecting',
-      3: 'disconnecting',
-      99: 'uninitialized'
-    };
-    
-    return res.status(503).json({
-      status: 'offline',
-      database: states[dbState] || 'unknown',
+    return res.status(200).json({
+      status: 'online',
+      database: 'local-fallback',
       details: lastMongoError
     });
   }
@@ -357,6 +372,32 @@ app.post('/api/login', checkDbConnection, async (req, res) => {
   try {
     const normalizedPhone = phone.trim();
     
+    if (req.useLocalFallback) {
+      const db = readLocalDb();
+      let user = db.users.find(u => u.phone === normalizedPhone);
+      if (!user) {
+        user = {
+          name: name.trim(),
+          phone: normalizedPhone,
+          dob: dob.trim(),
+          createdAt: new Date().toISOString()
+        };
+        db.users.push(user);
+        writeLocalDb(db);
+      }
+      const sessionToken = crypto.randomBytes(32).toString('hex');
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful (offline fallback).',
+        session: {
+          token: sessionToken,
+          phone: user.phone,
+          name: user.name,
+          loggedInAt: Date.now()
+        }
+      });
+    }
+
     // Check if user exists
     let user = await User.findOne({ phone: normalizedPhone });
     
@@ -401,6 +442,11 @@ app.get('/api/history', checkDbConnection, async (req, res) => {
 
   try {
     const normalizedPhone = phone.trim();
+    if (req.useLocalFallback) {
+      const db = readLocalDb();
+      const history = db.history.filter(h => h.phone === normalizedPhone).sort((a, b) => b.id - a.id);
+      return res.status(200).json({ success: true, history });
+    }
     const history = await History.find({ phone: normalizedPhone }).sort({ id: -1 });
     return res.status(200).json({ success: true, history });
   } catch (error) {
@@ -419,6 +465,28 @@ app.post('/api/history', checkDbConnection, async (req, res) => {
 
   try {
     const normalizedPhone = phone.trim();
+    if (req.useLocalFallback) {
+      const db = readLocalDb();
+      const newRecord = {
+        phone: normalizedPhone,
+        name: name.trim(),
+        subject,
+        difficulty,
+        totalQuestions,
+        score,
+        percentage,
+        status,
+        dateTime,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      db.history.push(newRecord);
+      writeLocalDb(db);
+      const history = db.history.filter(h => h.phone === normalizedPhone).sort((a, b) => b.id - a.id);
+      return res.status(200).json({ success: true, message: 'Record saved successfully (offline fallback).', history });
+    }
+
     const newRecord = new History({
       phone: normalizedPhone,
       name: name.trim(),
@@ -454,6 +522,16 @@ app.delete('/api/history/:id', checkDbConnection, async (req, res) => {
 
   try {
     const normalizedPhone = phone.trim();
+    if (req.useLocalFallback) {
+      const db = readLocalDb();
+      const initialLen = db.history.length;
+      db.history = db.history.filter(h => !(h.id === parseInt(id) && h.phone === normalizedPhone));
+      if (db.history.length === initialLen) {
+        return res.status(404).json({ error: 'Record not found or not owned by you.' });
+      }
+      writeLocalDb(db);
+      return res.status(200).json({ success: true, message: 'Record deleted successfully (offline fallback).' });
+    }
     const result = await History.deleteOne({ id: parseInt(id), phone: normalizedPhone });
     
     if (result.deletedCount === 0) {
@@ -477,6 +555,12 @@ app.delete('/api/history', checkDbConnection, async (req, res) => {
 
   try {
     const normalizedPhone = phone.trim();
+    if (req.useLocalFallback) {
+      const db = readLocalDb();
+      db.history = db.history.filter(h => h.phone !== normalizedPhone);
+      writeLocalDb(db);
+      return res.status(200).json({ success: true, message: 'All history cleared successfully (offline fallback).' });
+    }
     await History.deleteMany({ phone: normalizedPhone });
     return res.status(200).json({ success: true, message: 'All history cleared successfully.' });
   } catch (error) {
